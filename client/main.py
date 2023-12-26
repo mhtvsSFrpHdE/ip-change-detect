@@ -17,6 +17,7 @@ knownPresharedKey = Response().presharedKey
 serverInformationRecorded = False
 retryCountOnDisconnect = 0
 
+
 def retry():
     global retryCountOnDisconnect
 
@@ -26,12 +27,19 @@ def retry():
     if retryCountOnDisconnect > config.clientRetryMaxCountOnDisconnect:
         raise Exception(f'Maximum retry count reached')
 
+
+def resetRetryCountOnDisconnect():
+    global retryCountOnDisconnect
+
+    retryCountOnDisconnect = 0
+
+
 while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             # Connect
             s.connect((HOST, PORT))
-            retryCountOnDisconnect = 0
+            resetRetryCountOnDisconnect()
             print(f'Connected to server {HOST}, {PORT}')
 
             # Parse response
@@ -73,11 +81,11 @@ while True:
                 retry()
             except Exception as e:
                 print(f'RetryError: {e}')
-                retryCountOnDisconnect = 0
+                resetRetryCountOnDisconnect()
         except Exception as e:
             print(f'UnknownError: {e}')
             try:
                 retry()
             except Exception as e:
                 print(f'RetryError: {e}')
-                retryCountOnDisconnect = 0
+                resetRetryCountOnDisconnect()
