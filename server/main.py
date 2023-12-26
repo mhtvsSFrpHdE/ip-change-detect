@@ -8,7 +8,9 @@ HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
 # Use preshared key as identity, emulate disconnect caused by network fluctuations
-debugFixedIdentity = True
+debugFixedIdentity = False
+
+response = Response()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
@@ -20,7 +22,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"Connected by {addr}")
             while True:
                 try:
-                    response = Response()
                     if debugFixedIdentity:
                         response.serverIdentity = response.presharedKey
                     responseAsJsonString = response.toJson()
