@@ -11,7 +11,7 @@ HOST = "127.0.0.1"  # The server's hostname or IP address
 PORT = 65432  # The port used by the server
 
 knownServerName = None
-knownServerVersion = None
+knownServerVersion = Response().serverVersion
 knownServerIdentity = None
 knownPresharedKey = Response().presharedKey
 serverInformationRecorded = False
@@ -45,10 +45,9 @@ while True:
             print(f'identity: {response.serverIdentity}')
             print(f'preshared key: {response.presharedKey}')
 
-            # Remember server information
+            # Remember server information, some property is fixed from config
             if serverInformationRecorded == False:
                 knownServerName = response.serverName
-                knownServerVersion = response.serverVersion
                 knownServerIdentity = response.serverIdentity
                 serverInformationRecorded = True
 
