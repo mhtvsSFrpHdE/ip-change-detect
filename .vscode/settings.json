@@ -1,0 +1,6 @@
+{
+    "autopep8.args": [
+        "--line-length",
+        "999"
+    ]
+}
