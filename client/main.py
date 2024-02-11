@@ -6,10 +6,8 @@ import sys    # nopep8
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
 import config    # nopep8
-import custom_exception
-
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
+import custom_exception    # nopep8
+import dns_resolver    # nopep8
 
 knownServerVersion = Response().serverVersion
 knownServerIdentity = None
@@ -40,17 +38,24 @@ def resetRetryCountOnDisconnect():
 
     retryCountOnDisconnect = 0
 
+def getObjectTypeName(e):
+    typeName = e.__class__.__name__
+    return typeName
 
 while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
+            serverAddress = dns_resolver.getCurrentDnsRecord(config.dnsResolver, config.dnsRecord)
+            serverPort = config.serverPort
+            print(f'Exist DNS record: {serverAddress}')
+
             # Connect
-            s.connect((HOST, PORT))
+            s.connect((serverAddress, serverPort))
             resetRetryCountOnDisconnect()
-            print(f'Connected to server {HOST}, {PORT}')
+            print(f'Connected to server {serverAddress}, {serverPort}')
 
             # Parse response
-            data = s.recv(1024)
+            data = s.recv(config.socketBufferLength)
             responseAsJsonString = data.decode()
             response = Response.fromJson(responseAsJsonString)
 
@@ -87,35 +92,46 @@ while True:
             # Block at here, keep long connection
             data = s.recv(1024)
         except JSONDecodeError as e:
-            print(f'JSONDecodeError: {e}')
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
 
             # Failed to parse JSON, IP address may be changed
             # TODO: Update DDNS here
 
             retry()
         except custom_exception.ServerInformationMismatchException as e:
-            print(f'ServerInformationError: {e}')
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
 
             # Failed to verify preshared key, IP address may be changed
             # TODO: Update DDNS here
 
             retry()
         except ConnectionResetError as e:
-            print(f'ConnectionResetError: {e}')
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
 
             # Long connection disconnected, IP address may be changed
             # TODO: Update DDNS here
 
             retry()
         except ConnectionRefusedError as e:
-            print(f'ConnectionRefusedError: {e}')
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
 
-            # Failed to connect server, IP address may be changed
+            # Failed to connect server, address may be online but refused, IP address may be changed
             # TODO: Update DDNS here
 
             retry()
+        except TimeoutError as e:
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
+            # Failed to connect server, timeout, address may be not exist, IP address may be changed
+            # TODO: Update DDNS here
         except Exception as e:
-            print(f'UnknownError: {e}')
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
 
             # Unknown is bad, stop future action
             break
