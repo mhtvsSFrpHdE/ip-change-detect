@@ -1,6 +1,7 @@
 import CloudFlare    # nopep8
 import config    # nopep8
 import custom_exception    # nopep8
+import dns_resolver    # nopep8
 
 def updateDnsRecord(targetAddress):
     try:
@@ -19,8 +20,20 @@ def updateDnsRecord(targetAddress):
             'type':dnsRecord['type'],
             'content':targetAddress
         }
-        putResult = cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
+        cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
     except Exception as e:
         cloudFlareException = custom_exception.CloudFlareException()
         cloudFlareException.rawException = e
         raise cloudFlareException
+
+def ddnsMain():
+    currentExternalIpAddress = dns_resolver.getExternalIpAddress()
+    currentDnsRecord = dns_resolver.getCurrentDnsRecord()
+    print(f'Current external IP address: {currentExternalIpAddress}')
+    print(f'Current DNS record: {currentDnsRecord}')
+    if currentDnsRecord == currentExternalIpAddress:
+        print(f'DNS record does not need to be updated')
+        return
+
+    updateDnsRecord(currentExternalIpAddress)
+    print(f'DNS record has updated to: {currentExternalIpAddress}')

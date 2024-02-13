@@ -19,6 +19,7 @@ serverInformationRecorded = False
 retryCountOnDisconnect = 0
 internetOnline = False
 ddnsRequest = False
+retryRunningOut = False
 
 def updateRetryCount():
     global retryCountOnDisconnect
@@ -29,12 +30,23 @@ def updateRetryCount():
     if retryCountOnDisconnect > config.clientRetryMaxCountOnDisconnect:
         raise custom_exception.MaximumRetryCountException(f'Maximum retry count reached')
 
-def retry():
+def queueDdnsRequest():
+    global ddnsRequest
+
+    ddnsRequest = True
+    print('DDNS request queued')
+
+def queueRetry():
     try:
+        # Retry without DDNS request
         updateRetryCount()
     except custom_exception.MaximumRetryCountException as e:
-        print(f'RetryError: {e}')
+        # Retry count running out, queue DDNS request
+        exceptionTypeName = getObjectTypeName(e)
+        print(f'{exceptionTypeName}: {e}')
+
         resetRetryCountOnDisconnect()
+        queueDdnsRequest()
 
 def resetRetryCountOnDisconnect():
     global retryCountOnDisconnect
@@ -46,28 +58,45 @@ def getObjectTypeName(e):
     return typeName
 
 while True:
-    # Update DDNS
+    # Check internet
+    if internetOnline == False:
+        try:
+            internet_alive.testInternet()
+            internetOnline = True
+            continue
+        except custom_exception.InternetOfflineException as e:
+            # Failed to test internet, internet may be offline
+            # The reason to use different exception from NoNameservers
+            # You can know is internet alive server has no response
+            # or DNS server has no response
+
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
+            time.sleep(config.clientReconnectInterval)
+            continue
+    # Update DDNS if needed
     if ddnsRequest == True:
-        # TODO: Update DDNS here
+        ddns.ddnsMain()
+
         ddnsRequest = False
         continue
-    # DDNS has set, connect to server
+    # Connect to server
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
-            if internetOnline == False:
-                internet_alive.testInternet()
-                internetOnline = True
-
-            serverAddress = dns_resolver.getCurrentDnsRecord(config.dnsResolver, config.dnsRecord)
+            serverAddress = dns_resolver.getCurrentDnsRecord()
             serverPort = config.serverPort
-            print(f'Exist DNS record: {serverAddress}')
+            print(f'Get server address from DNS record: {serverAddress}')
 
             # Connect
+            s.settimeout(float(config.clientSocketTimeout))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             s.connect((serverAddress, serverPort))
             resetRetryCountOnDisconnect()
-            print(f'Connected to server {serverAddress}, {serverPort}')
+            print(f'Connected to server {serverAddress}, port {serverPort}')
 
             # Parse response
+            s.settimeout(None)
             data = s.recv(config.socketBufferLength)
             responseAsJsonString = data.decode()
             response = Response.fromJson(responseAsJsonString)
@@ -105,61 +134,55 @@ while True:
             # Block at here, keep long connection
             data = s.recv(config.socketBufferLength)
         except JSONDecodeError as e:
-            # Failed to parse JSON, IP address may be changed
-            # TODO: Update DDNS here
+            # Failed to parse JSON, connected to unknown server, IP address may be changed
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            retry()
+            queueRetry()
         except custom_exception.ServerInformationMismatchException as e:
             # Failed to verify preshared key, IP address may be changed
-            # TODO: Update DDNS here
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            retry()
+            queueRetry()
         except ConnectionResetError as e:
             # Long connection disconnected, IP address may be changed
-            # TODO: Update DDNS here
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            retry()
+            queueRetry()
         except ConnectionRefusedError as e:
             # Failed to connect server, address may be online but refused, IP address may be changed
-            # TODO: Update DDNS here
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            retry()
+            queueRetry()
         except TimeoutError as e:
             # Failed to connect server, timeout, address may be not exist, IP address may be changed
-            # TODO: Update DDNS here
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
+
+            queueRetry()
+        except ConnectionAbortedError as e:
+            # Connection disconnected, IP address may be changed
+
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
+            queueRetry()
         except dns_resolver.NoNameservers as e:
-            # Failed to query exist ip address, DNS server may be offline
+            # Failed to query ip address, DNS server or internet may be offline
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
             time.sleep(config.clientReconnectInterval)
             internetOnline = False
-        except custom_exception.InternetOfflineException as e:
-            # Failed to test internet, internet may be offline
-            # The reason to use different exception from NoNameservers
-            # You can know is internet alive server has no response
-            # or DNS server has no response
-
-            exceptionTypeName = getObjectTypeName(e)
-            print(f'{exceptionTypeName}: {e}')
-
-            time.sleep(config.clientReconnectInterval)
         except Exception as e:
             # Unknown is bad, stop future action
 

@@ -7,7 +7,7 @@ def getExternalIpAddress():
     externalIpAddress = answer[0].to_text()
     return externalIpAddress
 
-def getCurrentDnsRecord(where, qname):
-    answer = dns.resolver.resolve_at(where=where, qname=qname, rdtype=config.dnsRecordType)
+def getCurrentDnsRecord():
+    answer = dns.resolver.resolve_at(where=config.dnsResolver, qname=config.dnsRecord, rdtype=config.dnsRecordType)
     currentIpAddress = answer[0].to_text()
     return currentIpAddress
