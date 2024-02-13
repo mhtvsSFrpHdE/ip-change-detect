@@ -16,3 +16,7 @@ class InternetOfflineException(RawException):
 
 class CloudFlareException(RawException):
     pass
+
+# Stop catch unknown exception, use this one for a while to actually catch nothing
+class ExceptionPlaceholder(Exception):
+    pass

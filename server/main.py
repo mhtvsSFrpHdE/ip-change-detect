@@ -5,6 +5,7 @@ import keepalive    # nopep8
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
 import config    # nopep8
+import custom_exception    # nopep8
 
 HOST = config.serverListenAddress
 PORT = config.serverPort
@@ -33,6 +34,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if not data:
                         print(f"{addr} disconnected")
                         break
-                except Exception as e:
+                except custom_exception.ExceptionPlaceholder as e:
                     print(e)
                     break

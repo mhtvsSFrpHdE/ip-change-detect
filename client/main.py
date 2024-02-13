@@ -64,7 +64,7 @@ while True:
             internet_alive.testInternet()
             internetOnline = True
             continue
-        except custom_exception.InternetOfflineException as e:
+        except custom_exception.ExceptionPlaceholder as e:
             # Failed to test internet, internet may be offline
             # The reason to use different exception from NoNameservers
             # You can know is internet alive server has no response
@@ -80,7 +80,7 @@ while True:
         try:
             ddns.ddnsMain()
             ddnsRequest = False
-        except Exception as e:
+        except custom_exception.InternetOfflineException as e:
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
             print("DDNS request failed, retrying")
@@ -191,7 +191,7 @@ while True:
 
             time.sleep(config.clientReconnectInterval)
             internetOnline = False
-        except Exception as e:
+        except custom_exception.ExceptionPlaceholder as e:
             # Unknown is bad, stop future action
 
             exceptionTypeName = getObjectTypeName(e)

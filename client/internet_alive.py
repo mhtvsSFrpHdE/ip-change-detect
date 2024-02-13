@@ -13,7 +13,7 @@ def testInternet():
         # dns.resolver.reset_default_resolver() see README.md
         # From offline to online
         dns.resolver.reset_default_resolver()
-    except Exception as e:
+    except custom_exception.ExceptionPlaceholder as e:
         internetOfflineException = custom_exception.InternetOfflineException("Internet offline")
         internetOfflineException.rawException = e
         raise internetOfflineException

@@ -22,7 +22,7 @@ def updateDnsRecord(targetAddress):
             'content':targetAddress
         }
         cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
-    except Exception as e:
+    except custom_exception.ExceptionPlaceholder as e:
         cloudFlareException = custom_exception.CloudFlareException()
         cloudFlareException.rawException = e
         raise cloudFlareException
