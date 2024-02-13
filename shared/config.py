@@ -9,3 +9,6 @@ presharedKey = "9IGFWa9hcKmtbh0CNsdj"
 socketBufferLength = 1024
 dnsResolver = None
 dnsRecord = None
+dnsRecordType = "A"
+internetAliveServer = None
+internetAliveQuery = None

@@ -6,3 +6,6 @@ class MaximumRetryCountException(Exception):
 
 class ServerInformationMismatchException(Exception):
     pass
+
+class InternetOfflineException(Exception):
+    pass

@@ -8,6 +8,7 @@ from response import Response    # nopep8
 import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
+import internet_alive    # nopep8
 
 knownServerVersion = Response().serverVersion
 knownServerIdentity = None
@@ -15,6 +16,7 @@ knownServerIdentity = None
 knownPresharedKey = Response().presharedKey
 serverInformationRecorded = False
 retryCountOnDisconnect = 0
+internetOnline = False
 
 
 def updateRetryCount():
@@ -45,6 +47,10 @@ def getObjectTypeName(e):
 while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
+            if internetOnline == False:
+                internet_alive.testInternet()
+                internetOnline = True
+
             serverAddress = dns_resolver.getCurrentDnsRecord(config.dnsResolver, config.dnsRecord)
             serverPort = config.serverPort
             print(f'Exist DNS record: {serverAddress}')
@@ -90,48 +96,67 @@ while True:
 
             # Server will not send future response
             # Block at here, keep long connection
-            data = s.recv(1024)
+            data = s.recv(config.socketBufferLength)
         except JSONDecodeError as e:
-            exceptionTypeName = getObjectTypeName(e)
-            print(f'{exceptionTypeName}: {e}')
-
             # Failed to parse JSON, IP address may be changed
             # TODO: Update DDNS here
 
-            retry()
-        except custom_exception.ServerInformationMismatchException as e:
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
+            retry()
+        except custom_exception.ServerInformationMismatchException as e:
             # Failed to verify preshared key, IP address may be changed
             # TODO: Update DDNS here
 
-            retry()
-        except ConnectionResetError as e:
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
+            retry()
+        except ConnectionResetError as e:
             # Long connection disconnected, IP address may be changed
             # TODO: Update DDNS here
 
-            retry()
-        except ConnectionRefusedError as e:
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
+            retry()
+        except ConnectionRefusedError as e:
             # Failed to connect server, address may be online but refused, IP address may be changed
             # TODO: Update DDNS here
 
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
             retry()
         except TimeoutError as e:
-            exceptionTypeName = getObjectTypeName(e)
-            print(f'{exceptionTypeName}: {e}')
-
             # Failed to connect server, timeout, address may be not exist, IP address may be changed
             # TODO: Update DDNS here
-        except Exception as e:
+
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+        except dns_resolver.NoNameservers as e:
+            # Failed to query exist ip address, DNS server may be offline
+
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
+            time.sleep(config.clientReconnectInterval)
+            internetOnline = False
+        except custom_exception.InternetOfflineException as e:
+            # Failed to test internet, internet may be offline
+            # The reason to use different exception from NoNameservers
+            # You can know is internet alive server has no response
+            # or DNS server has no response
+
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
+            time.sleep(config.clientReconnectInterval)
+        except Exception as e:
             # Unknown is bad, stop future action
+
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'UnknownException {exceptionTypeName}: {e}')
+
             break
