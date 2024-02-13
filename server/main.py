@@ -1,6 +1,7 @@
-import socket
+import socket    # nopep8
 import os    # nopep8
 import sys    # nopep8
+import keepalive    # nopep8
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
 import config    # nopep8
@@ -14,6 +15,7 @@ debugFixedIdentity = True
 response = Response()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    keepalive.set(s, after_idle_sec=1, interval_sec=1, max_fails=5)
     s.bind((HOST, PORT))
     s.listen()
     while True:
