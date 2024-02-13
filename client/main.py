@@ -9,6 +9,7 @@ import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
 import internet_alive    # nopep8
+import ddns    # nopep8
 
 knownServerVersion = Response().serverVersion
 knownServerIdentity = None
@@ -17,7 +18,7 @@ knownPresharedKey = Response().presharedKey
 serverInformationRecorded = False
 retryCountOnDisconnect = 0
 internetOnline = False
-
+ddnsRequest = False
 
 def updateRetryCount():
     global retryCountOnDisconnect
@@ -45,6 +46,12 @@ def getObjectTypeName(e):
     return typeName
 
 while True:
+    # Update DDNS
+    if ddnsRequest == True:
+        # TODO: Update DDNS here
+        ddnsRequest = False
+        continue
+    # DDNS has set, connect to server
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             if internetOnline == False:

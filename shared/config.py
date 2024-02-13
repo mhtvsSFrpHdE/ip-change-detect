@@ -12,3 +12,8 @@ dnsRecord = None
 dnsRecordType = "A"
 internetAliveServer = None
 internetAliveQuery = None
+useCloudflare = False
+cloudflareApiToken = None
+cloudflareZoneName = None
+externalActionOnIpChange = "ping.exe"
+

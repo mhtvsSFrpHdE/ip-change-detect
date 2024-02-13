@@ -7,5 +7,12 @@ class MaximumRetryCountException(Exception):
 class ServerInformationMismatchException(Exception):
     pass
 
-class InternetOfflineException(Exception):
+# In case of third party exception, store it in a variable
+class RawException(Exception):
+    rawException = None
+
+class InternetOfflineException(RawException):
+    pass
+
+class CloudFlareException(RawException):
     pass
