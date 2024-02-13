@@ -77,10 +77,18 @@ while True:
             continue
     # Update DDNS if needed
     if ddnsRequest == True:
-        ddns.ddnsMain()
+        try:
+            ddns.ddnsMain()
+            ddnsRequest = False
+        except Exception as e:
+            exceptionTypeName = getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+            print("DDNS request failed, retrying")
 
-        ddnsRequest = False
+            ddnsRequest = True
+            internetOnline = False
         continue
+
     # Connect to server
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:

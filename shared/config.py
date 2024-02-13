@@ -16,5 +16,4 @@ internetAliveQuery = None
 useCloudflare = False
 cloudflareApiToken = None
 cloudflareZoneName = None
-externalActionOnIpChange = "ping.exe"
-
+externalActionOnIpChange = "ping.exe 1.1.1.1"

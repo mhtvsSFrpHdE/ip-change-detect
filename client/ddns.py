@@ -2,6 +2,7 @@ import CloudFlare    # nopep8
 import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
+import subprocess    # nopep8
 
 def updateDnsRecord(targetAddress):
     try:
@@ -27,6 +28,13 @@ def updateDnsRecord(targetAddress):
         raise cloudFlareException
 
 def ddnsMain():
+    if (config.useCloudflare == False):
+        print('Update DDNS through external action')
+        process = subprocess.Popen(config.externalActionOnIpChange, shell=True)
+        process.wait()
+        print(f'External action return code: {process.returncode}')
+        return
+
     currentExternalIpAddress = dns_resolver.getExternalIpAddress()
     currentDnsRecord = dns_resolver.getCurrentDnsRecord()
     print(f'Current external IP address: {currentExternalIpAddress}')
