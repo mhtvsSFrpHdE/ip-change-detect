@@ -1,6 +1,16 @@
 class MaximumRetryCountException(Exception):
     pass
 
+# In case of connected to wrong server, it may not response in certain time
+
+class MaximumTimeoutCountException(Exception):
+    pass
+
+# In case of connected to wrong server, response may wrong
+
+class MaximumJsonDecodeErrorCountException(Exception):
+    pass
+
 # In case of same preshared key, server may be rebooted
 
 

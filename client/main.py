@@ -18,6 +18,8 @@ knownServerIdentity = None
 knownPresharedKey = Response().presharedKey
 serverInformationRecorded = False
 retryCountOnDisconnect = 0
+timeoutCountOnDisconnect = 0
+jsonDecodeErrorCountOnDisconnect = 0
 internetOnline = False
 ddnsRequest = False
 retryRunningOut = False
@@ -30,6 +32,24 @@ def updateRetryCount():
     retryCountOnDisconnect = retryCountOnDisconnect + 1
     if retryCountOnDisconnect > config.clientRetryMaxCountOnDisconnect:
         raise custom_exception.MaximumRetryCountException(f'Maximum retry count reached')
+
+def updateTimeoutCount():
+    global timeoutCountOnDisconnect
+
+    time.sleep(config.clientReconnectInterval)
+
+    timeoutCountOnDisconnect = timeoutCountOnDisconnect + 1
+    if timeoutCountOnDisconnect > config.clientTimeoutMaxCountOnDisconnect:
+        raise custom_exception.MaximumTimeoutCountException(f'Maximum timeout count reached')
+
+def updateJsonDecodeErrorCount():
+    global jsonDecodeErrorCountOnDisconnect
+
+    time.sleep(config.clientReconnectInterval)
+
+    jsonDecodeErrorCountOnDisconnect = jsonDecodeErrorCountOnDisconnect + 1
+    if jsonDecodeErrorCountOnDisconnect > config.clientJsonDecodeErrorMaxCountOnDisconnect:
+        raise custom_exception.MaximumJsonDecodeErrorCountException(f'Maximum timeout count reached')
 
 def queueDdnsRequest():
     global ddnsRequest
@@ -49,10 +69,44 @@ def queueRetry():
         resetRetryCountOnDisconnect()
         queueDdnsRequest()
 
+def queueTimeout():
+    try:
+        # Timeout without DDNS request
+        updateTimeoutCount()
+    except custom_exception.MaximumTimeoutCountException as e:
+        # Timeout count running out, queue DDNS request
+        exceptionTypeName = getObjectTypeName(e)
+        print(f'{exceptionTypeName}: {e}')
+
+        resetTimeoutCountOnDisconnect()
+        queueDdnsRequest()
+
+def queueJsonDecodeError():
+    try:
+        # JSON decode error without DDNS request
+        updateJsonDecodeErrorCount()
+    except custom_exception.MaximumJsonDecodeErrorCountException as e:
+        # JSON decode error count running out, queue DDNS request
+        exceptionTypeName = getObjectTypeName(e)
+        print(f'{exceptionTypeName}: {e}')
+
+        resetJsonDecodeErrorCountOnDisconnect()
+        queueDdnsRequest()
+
 def resetRetryCountOnDisconnect():
     global retryCountOnDisconnect
 
     retryCountOnDisconnect = 0
+
+def resetTimeoutCountOnDisconnect():
+    global timeoutCountOnDisconnect
+
+    timeoutCountOnDisconnect = 0
+
+def resetJsonDecodeErrorCountOnDisconnect():
+    global jsonDecodeErrorCountOnDisconnect
+
+    jsonDecodeErrorCountOnDisconnect = 0
 
 def getObjectTypeName(e):
     typeName = e.__class__.__name__
@@ -105,7 +159,6 @@ while True:
             print(f'Connected to server {serverAddress}, port {serverPort}')
 
             # Parse response
-            s.settimeout(None)
             data = s.recv(config.socketBufferLength)
             responseAsJsonString = data.decode()
             response = Response.fromJson(responseAsJsonString)
@@ -144,6 +197,7 @@ while True:
 
             # Server will not send future response
             # Block at here, keep long connection
+            s.settimeout(None)
             data = s.recv(config.socketBufferLength)
         except JSONDecodeError as e:
             # Failed to parse JSON, connected to unknown server, IP address may be changed
@@ -151,7 +205,7 @@ while True:
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            queueRetry()
+            queueJsonDecodeError()
         except custom_exception.ServerInformationMismatchException as e:
             # Failed to verify preshared key, IP address may be changed
 
@@ -174,12 +228,13 @@ while True:
 
             queueRetry()
         except TimeoutError as e:
-            # Failed to connect server, timeout, address may be not exist, IP address may be changed
+            # Failed to connect server, timeout, address may be not exist,
+            # connected to wrong server that not answer in certain time, IP address may be changed
 
             exceptionTypeName = getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
 
-            queueRetry()
+            queueTimeout()
         except ConnectionAbortedError as e:
             # Connection disconnected, IP address may be changed
 
