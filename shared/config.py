@@ -1,27 +1,106 @@
-serverName = "IP change detect"
-serverVersion = 0
-serverIdentityLength = 20
-serverListenAddress = None
+# ===== Password =====
+
+# string, Client use this password to know if connected to expected server
+presharedKey = "9IGFWa9hcKmtbh0CNsdj"
+
+# ===== Password =====
+
+# ===== Server config =====
+
+# string, IP address like "192.168.1.100"
+serverListenAddress = "127.0.0.1"
+# int, port number
 serverPort = 65432
+
+# int, if client count is more than this number, client will be disconnected
+# Usually only 1 client will connect, otherwise you may under DDOS attack
 serverMaxConnection = 10
+
+# ===== Server config =====
+
+# ===== Client config =====
+
+# string, Your DNS provider DNS server that has most up to date DNS record
+# A third party DNS server has its own DNS cache and the query result can be outdated
+# For example, if use cloudflare, dnsResolver is "izabella.ns.cloudflare.com"
+dnsResolver = None
+# string, Your domain A record address like "a.bing.com", client will connect to this address
+# if use cloudflare, DNS record will also submit to this address
+dnsRecord = None
+# string, Your domain record type, for IPv4, is "A" record, IPv6 is "AAAA"
+# but currently there is no IPv6 support
+dnsRecordType = "A"
+# string, specify a DNS server and DNS record here
+# This DNS server will be used for internet online test
+# Specify a different server than dnsResolver can let you to know
+# if it's indeed offline or just DNS provider is down
+internetAliveServer = None
+internetAliveQuery = None
+# bool, Use cloudflare API to update DNS record and get DDNS
+useCloudflare = False
+useCloudflare = True
+# string, Your cloudflare API token
+cloudflareApiToken = None
+# string, Your cloudflare zone name, usually is your domain root name, "bing.com"
+cloudflareZoneName = None
+# string, If your domain is not use cloudflare DNS
+# specify an external command that can update your DDNS
+# or anything else
+externalActionOnIpChange = "ping.exe 1.1.1.1"
+
+# ===== Client config =====
+
+# ===== Client default value =====
+
+# int, second, timeout when client try to connect
 clientSocketTimeout = 3
+# int, second, retry interval when client connection failed
 clientReconnectInterval = 1
+# int, second, max retry count when client connection failed before request DDNS update
 clientRetryMaxCountOnDisconnect = 5
+# int, second, max retry count when client connect to unknown server (no response)
 clientTimeoutMaxCountOnDisconnect = 5
+# int, second, max retry count when client connect to unknown server (wrong response)
 clientJsonDecodeErrorMaxCountOnDisconnect = 5
+
+# ===== Client default value =====
+
+# ===== Socket default value =====
+
+# int, Socket keepalive settings, if server or client suddenly done
+# socket will not shutdown automatically and on both side don't know another side is off
+# keepalive packet 60, 0, 0 may test connection is alive each minute
 keepaliveAfterIdleSec = 60
 keepaliveIntervalSec = 0
 keepaliveMaxFails = 0
-debugServerFixIdentity = False
-debugClientConnectToListenAddress = False
-presharedKey = "9IGFWa9hcKmtbh0CNsdj"
+# int, socket recv argument
 socketBufferLength = 1024
-dnsResolver = None
-dnsRecord = None
-dnsRecordType = "A"
-internetAliveServer = None
-internetAliveQuery = None
-useCloudflare = False
-cloudflareApiToken = None
-cloudflareZoneName = None
-externalActionOnIpChange = "ping.exe 1.1.1.1"
+
+# ===== Socket default value =====
+
+# ===== Server information =====
+
+# These are optional variable describe server information
+# But they may not actually be used in server identity verification
+serverName = "IP change detect"
+serverVersion = 0
+serverIdentityLength = 20
+
+# ===== Server information =====
+
+# ===== Debug flag =====
+
+# bool, server use same identity in each reboot
+debugServerFixIdentity = False
+# bool, client connect to serverListenAddress directly instead of get server address from DNS record
+debugClientConnectToListenAddress = False
+debugClientConnectToListenAddress = False
+
+# ===== Debug flag =====
+
+# ===== Metadata =====
+
+# int, version of config file itself, automatically update config format in future
+configVersion = 0
+
+# ===== Metadata =====
