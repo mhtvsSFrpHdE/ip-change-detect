@@ -13,6 +13,7 @@ HOST = config.serverListenAddress
 PORT = config.serverPort
 response = Response()
 selector = selectors.DefaultSelector()
+connectionCount = 0
 
 class ConnectionCallback():
     def __init__(self, callback, data):
@@ -21,8 +22,9 @@ class ConnectionCallback():
 
 # IO multiplexing recv
 def recvCallback(data):
-    conn, addr = data
+    global connectionCount
 
+    conn, addr = data
     try:
         receive = conn.recv(config.socketBufferLength)
         if not receive:
@@ -33,15 +35,26 @@ def recvCallback(data):
     print(f"Disconnected by {addr}")
     selector.unregister(conn)
     conn.close()
+    connectionCount = connectionCount - 1
 
 # IO multiplexing accept
 def acceptCallback(serverSocket):
+    global connectionCount
+
     conn, addr = serverSocket.accept()
+    conn.setblocking(False)
+    print(f"Connected by {addr}")
+
+    connectionCount = connectionCount + 1
+    if connectionCount > config.serverMaxConnection:
+        conn.close()
+        connectionCount = connectionCount - 1
+        print(f"Connection limit {connectionCount} exceeded, connection closed")
+        return
+
     selectorData = ConnectionCallback(recvCallback, (conn, addr))
     selector.register(conn, selectors.EVENT_READ, data=selectorData)
 
-    print(f"Connected by {addr}")
-    conn.setblocking(False)
     if config.debugServerFixIdentity:
         response.serverIdentity = response.presharedKey
     responseAsJsonString = response.toJson()

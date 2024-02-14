@@ -3,6 +3,7 @@ serverVersion = 0
 serverIdentityLength = 20
 serverListenAddress = None
 serverPort = 65432
+serverMaxConnection = 10
 clientSocketTimeout = 3
 clientReconnectInterval = 1
 clientRetryMaxCountOnDisconnect = 5
