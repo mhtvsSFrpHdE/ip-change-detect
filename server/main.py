@@ -76,26 +76,3 @@ while True:
     for key, mask in events:
         selectorData = key.data
         selectorData.callback(selectorData.data)
-
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     keepalive.set(s, after_idle_sec=1, interval_sec=1, max_fails=5)
-#     s.bind((HOST, PORT))
-#     s.listen()
-#     while True:
-#         print("Ready for connection")
-#         conn, addr = s.accept()
-#         with conn:
-#             print(f"Connected by {addr}")
-#             while True:
-#                 try:
-#                     if debugFixedIdentity:
-#                         response.serverIdentity = response.presharedKey
-#                     responseAsJsonString = response.toJson()
-#                     conn.sendall(responseAsJsonString.encode())
-#                     data = conn.recv(config.socketBufferLength)
-#                     if not data:
-#                         print(f"{addr} disconnected")
-#                         break
-#                 except custom_exception.ExceptionPlaceholder as e:
-#                     print(e)
-#                     break
