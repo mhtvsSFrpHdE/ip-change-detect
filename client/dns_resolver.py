@@ -8,6 +8,9 @@ def getExternalIpAddress():
     return externalIpAddress
 
 def getCurrentDnsRecord():
+    if config.debugClientConnectToListenAddress == True:
+        return config.serverListenAddress
+
     answer = dns.resolver.resolve_at(where=config.dnsResolver, qname=config.dnsRecord, rdtype=config.dnsRecordType)
     currentIpAddress = answer[0].to_text()
     return currentIpAddress

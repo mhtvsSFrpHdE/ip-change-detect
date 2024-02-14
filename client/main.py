@@ -3,6 +3,7 @@ import socket
 import time
 import os    # nopep8
 import sys    # nopep8
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
 import config    # nopep8
@@ -115,6 +116,9 @@ while True:
             print(f'identity: {response.serverIdentity}')
             print(f'preshared key: {response.presharedKey}')
 
+            # Debug code to test during server shutdown
+            # s.close()
+
             if serverInformationRecorded == False:
                 knownServerIdentity = response.serverIdentity
                 serverInformationRecorded = True
@@ -130,12 +134,12 @@ while True:
                 # Disconnect
                 raise custom_exception.ServerInformationMismatchException(f'Connected server information mismatch with known')
             else:
-                print('Server identity verified')
+                print('Server verified by preshared key')
 
             if sameVersion == False:
-                print('Warning: Server version is different')
+                print('Warning: Server version is different than previous connected server')
             if sameIdentity == False:
-                print('Warning: Server identity is different')
+                print('Warning: Server identity is different than previous connected server')
                 knownServerIdentity = response.serverIdentity
 
             # Server will not send future response
