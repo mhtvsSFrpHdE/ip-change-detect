@@ -2,6 +2,8 @@ import config    # nopep8
 import dns.resolver    # nopep8
 import custom_exception    # nopep8
 
+internetOnline = False
+
 def testInternet():
     try:
         # Test internet

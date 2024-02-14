@@ -7,6 +7,7 @@ import keepalive    # nopep8
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
 import config    # nopep8
+import example    # nopep8
 
 
 HOST = config.serverListenAddress
@@ -30,7 +31,8 @@ def recvCallback(data):
         if not receive:
             pass
     except ConnectionResetError as e:
-        print(e)
+        exceptionTypeName = example.getObjectTypeName(e)
+        print(f'{exceptionTypeName}: {e}')
 
     print(f"Disconnected by {addr}")
     selector.unregister(conn)
