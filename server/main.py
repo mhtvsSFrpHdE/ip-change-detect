@@ -1,8 +1,8 @@
 import socket    # nopep8
 import os    # nopep8
 import sys    # nopep8
-import keepalive    # nopep8
 import selectors    # nopep8
+import keepalive    # nopep8
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
@@ -62,7 +62,7 @@ def acceptCallback(serverSocket):
 
 # Create and listen server socket
 serverSocket = socket.socket()
-keepalive.set(serverSocket, after_idle_sec=1, interval_sec=1, max_fails=5)
+keepalive.set(serverSocket, after_idle_sec=config.keepaliveAfterIdleSec, interval_sec=config.keepaliveIntervalSec, max_fails=config.keepaliveMaxFails)
 serverSocket.bind((HOST, PORT))
 serverSocket.listen()
 serverSocket.setblocking(False)

@@ -1,8 +1,9 @@
-from json import JSONDecodeError
-import socket
-import time
+import socket    # nopep8
+import time    # nopep8
 import os    # nopep8
 import sys    # nopep8
+import keepalive    # nopep8
+from json import JSONDecodeError    # nopep8
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
@@ -119,7 +120,7 @@ while True:
             internet_alive.testInternet()
             internetOnline = True
             continue
-        except custom_exception.ExceptionPlaceholder as e:
+        except custom_exception.InternetOfflineException as e:
             # Failed to test internet, internet may be offline
             # The reason to use different exception from NoNameservers
             # You can know is internet alive server has no response
@@ -153,7 +154,7 @@ while True:
 
             # Connect
             s.settimeout(float(config.clientSocketTimeout))
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            keepalive.set(s, after_idle_sec=config.keepaliveAfterIdleSec, interval_sec=config.keepaliveIntervalSec, max_fails=config.keepaliveMaxFails)
             s.connect((serverAddress, serverPort))
             resetRetryCountOnDisconnect()
             print(f'Connected to server {serverAddress}, port {serverPort}')
