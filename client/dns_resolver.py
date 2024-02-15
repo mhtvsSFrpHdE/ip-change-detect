@@ -1,5 +1,7 @@
 import dns.resolver    # nopep8
 from dns.resolver import NoNameservers    # nopep8
+from dns.resolver import LifetimeTimeout    # nopep8
+
 import config    # nopep8
 
 def getExternalIpAddress():

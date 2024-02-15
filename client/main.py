@@ -39,7 +39,7 @@ while True:
     if connect.ddnsRequest == True:
         try:
             ddns.ddnsMain()
-            example.ddnsRequest = False
+            connect.ddnsRequest = False
         except custom_exception.InternetOfflineException as e:
             exceptionTypeName = example.getObjectTypeName(e)
             print(f'{exceptionTypeName}: {e}')
@@ -148,6 +148,14 @@ while True:
 
             connect.queueNetworkRetry()
         except dns_resolver.NoNameservers as e:
+            # Failed to query ip address, DNS server or internet may be offline
+
+            exceptionTypeName = example.getObjectTypeName(e)
+            print(f'{exceptionTypeName}: {e}')
+
+            time.sleep(config.clientReconnectInterval)
+            internet_alive.internetOnline = False
+        except dns_resolver.LifetimeTimeout as e:
             # Failed to query ip address, DNS server or internet may be offline
 
             exceptionTypeName = example.getObjectTypeName(e)

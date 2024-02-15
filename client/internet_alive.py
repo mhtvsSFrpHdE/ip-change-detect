@@ -19,3 +19,7 @@ def testInternet():
         internetOfflineException = custom_exception.InternetOfflineException("Internet offline")
         internetOfflineException.rawException = e
         raise internetOfflineException
+    except dns.resolver.LifetimeTimeout as e:
+        internetOfflineException = custom_exception.InternetOfflineException("Internet offline")
+        internetOfflineException.rawException = e
+        raise internetOfflineException
