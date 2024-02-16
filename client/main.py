@@ -67,6 +67,8 @@ while True:
             data = s.recv(config.socketBufferLength)
             responseAsJsonString = data.decode()
             response = verify_server.Response.fromJson(responseAsJsonString)
+            connect.resetJsonDecodeErrorCountOnDisconnect()
+            connect.resetServerTimeoutCountOnDisconnect()
 
             # Print response
             print(f'name: {response.serverName}')
