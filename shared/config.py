@@ -23,30 +23,33 @@ serverMaxConnection = 10
 # string, Your DNS provider DNS server that has most up to date DNS record
 # A third party DNS server has its own DNS cache and the query result can be outdated
 # For example, if use cloudflare, dnsResolver is "izabella.ns.cloudflare.com"
-dnsResolver = None
+clientDnsResolver = None
 # string, Your domain A record address like "a.bing.com", client will connect to this address
 # if use cloudflare, DNS record will also submit to this address
-dnsRecord = None
+clientDnsRecord = None
 # string, Your domain record type, for IPv4, is "A" record, IPv6 is "AAAA"
 # but currently there is no IPv6 support
-dnsRecordType = "A"
+clientDnsRecordType = "A"
 # string, specify a DNS server and DNS record here
 # This DNS server will be used for internet online test
 # Specify a different server than dnsResolver can let you to know
 # if it's indeed offline or just DNS provider is down
-internetAliveServer = None
-internetAliveQuery = None
+clientInternetAliveServer = "1.1.1.1"
+clientInternetAliveQuery = "bing.com"
 # bool, Use cloudflare API to update DNS record and get DDNS
-useCloudflare = False
-useCloudflare = True
+clientUseCloudflare = False
+clientUseCloudflare = True
 # string, Your cloudflare API token
-cloudflareApiToken = None
+clientCloudflareApiToken = None
 # string, Your cloudflare zone name, usually is your domain root name, "bing.com"
-cloudflareZoneName = None
+clientCloudflareZoneName = None
+# int, After call cloudflare API, wait second before try to continue connect
+# DNS record takes few time to be updated
+clientCloudflareApiSumbitDelay = 5
 # string, If your domain is not use cloudflare DNS
 # specify an external command that can update your DDNS
 # or anything else
-externalActionOnIpChange = "ping.exe 1.1.1.1"
+clientExternalActionOnIpChange = "ping.exe 1.1.1.1"
 
 # ===== Client config =====
 
@@ -97,6 +100,26 @@ debugClientConnectToListenAddress = False
 debugClientConnectToListenAddress = False
 
 # ===== Debug flag =====
+
+# ===== Log =====
+
+# string, Where to save logs
+logFolder = "../logs/<type>"
+logFolder = "logs/<type>"
+# string, Server log or client log
+logTypePlaceholder="<type>"
+# string, Timestamp position in log file name
+logTimestampPlaceholder = "<timestamp>"
+# string Timestamp format, goes to datetime.now().strftime
+logTimestampFormat = "%Y-%m-%d-%H-%M-%S"
+# string, Log file name with placeholder
+logFileName = "ip-change-detect-<type>-<timestamp>.log"
+# string, Server log folder name
+logTypeServer = "server"
+# string, Client log folder name
+logTypeClient = "client"
+
+# ===== Log =====
 
 # ===== Metadata =====
 

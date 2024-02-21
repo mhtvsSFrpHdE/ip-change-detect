@@ -3,6 +3,7 @@ import time    # nopep8
 import config    # nopep8
 import custom_exception    # nopep8
 import example    # nopep8
+import log    # nopep8
 
 networkRetryCountOnDisconnect = 0
 serverTimeoutCountOnDisconnect = 0
@@ -14,7 +15,7 @@ def queueDdnsRequest():
     global ddnsRequest
 
     ddnsRequest = True
-    print('DDNS request queued')
+    log.printToLog('DDNS request queued')
 
 def resetNetworkRetryCountOnDisconnect():
     global networkRetryCountOnDisconnect
@@ -65,7 +66,7 @@ def queueNetworkRetry():
     except custom_exception.MaximumRetryCountException as e:
         # Retry count running out, queue DDNS request
         exceptionTypeName = example.getObjectTypeName(e)
-        print(f'{exceptionTypeName}: {e}')
+        log.printToLog(f'{exceptionTypeName}: {e}')
 
         resetNetworkRetryCountOnDisconnect()
         queueDdnsRequest()
@@ -77,7 +78,7 @@ def queueServerTimeout():
     except custom_exception.MaximumTimeoutCountException as e:
         # Timeout count running out, queue DDNS request
         exceptionTypeName = example.getObjectTypeName(e)
-        print(f'{exceptionTypeName}: {e}')
+        log.printToLog(f'{exceptionTypeName}: {e}')
 
         resetServerTimeoutCountOnDisconnect()
         queueDdnsRequest()
@@ -89,7 +90,7 @@ def queueJsonDecodeError():
     except custom_exception.MaximumJsonDecodeErrorCountException as e:
         # JSON decode error count running out, queue DDNS request
         exceptionTypeName = example.getObjectTypeName(e)
-        print(f'{exceptionTypeName}: {e}')
+        log.printToLog(f'{exceptionTypeName}: {e}')
 
         resetJsonDecodeErrorCountOnDisconnect()
         queueDdnsRequest()

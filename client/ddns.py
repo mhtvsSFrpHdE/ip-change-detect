@@ -5,16 +5,17 @@ import subprocess    # nopep8
 import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
+import log    # nopep8
 
 def updateDnsRecord(targetAddress):
     try:
-        cf = CloudFlare.CloudFlare(token=config.cloudflareApiToken)
+        cf = CloudFlare.CloudFlare(token=config.clientCloudflareApiToken)
 
-        zones = cf.zones.get(params={'name':config.cloudflareZoneName})
+        zones = cf.zones.get(params={'name':config.clientCloudflareZoneName})
         zone = zones[0]
         zoneId = zone['id']
 
-        dnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.dnsRecord})
+        dnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.clientDnsRecord})
         dnsRecord = dnsRecords[0]
         dnsRecordId = dnsRecord['id']
 
@@ -30,22 +31,22 @@ def updateDnsRecord(targetAddress):
         raise cloudFlareException
 
 def ddnsMain():
-    if (config.useCloudflare == False):
-        print('Update DDNS through external action')
-        process = subprocess.Popen(config.externalActionOnIpChange, shell=True)
+    if (config.clientUseCloudflare == False):
+        log.printToLog('Update DDNS through external action')
+        process = subprocess.Popen(config.clientExternalActionOnIpChange, shell=True)
         process.wait()
-        print(f'External action return code: {process.returncode}')
+        log.printToLog(f'External action return code: {process.returncode}')
         return
 
     currentExternalIpAddress = dns_resolver.getExternalIpAddress()
     currentDnsRecord = dns_resolver.getCurrentDnsRecord()
-    print(f'Current external IP address: {currentExternalIpAddress}')
-    print(f'Current DNS record: {currentDnsRecord}')
+    log.printToLog(f'Current external IP address: {currentExternalIpAddress}')
+    log.printToLog(f'Current DNS record: {currentDnsRecord}')
     if currentDnsRecord == currentExternalIpAddress:
-        print(f'DNS record does not need to be updated')
+        log.printToLog(f'DNS record does not need to be updated')
         return
 
     updateDnsRecord(currentExternalIpAddress)
-    print(f'DNS record has updated to: {currentExternalIpAddress}')
+    log.printToLog(f'DNS record has updated to: {currentExternalIpAddress}')
 
-    time.sleep(config.cloudflareApiSumbitDelay)
+    time.sleep(config.clientCloudflareApiSumbitDelay)

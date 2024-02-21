@@ -10,7 +10,7 @@ def testInternet():
         # The idea is your environment should be at least allow 53 UDP available to use
         # ICMP ping needs admin permission if not using system ping.exe
         # so send a DNS query to the internet alive server, if get response, it is online
-        dns.resolver.resolve_at(where=config.internetAliveServer, qname=config.internetAliveQuery, rdtype=config.dnsRecordType)
+        dns.resolver.resolve_at(where=config.clientInternetAliveServer, qname=config.clientInternetAliveQuery, rdtype=config.clientDnsRecordType)
 
         # dns.resolver.reset_default_resolver() see README.md
         # From offline to online

@@ -8,7 +8,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # no
 from response import Response    # nopep8
 import config    # nopep8
 import example    # nopep8
+import log    # nopep8
 
+log.initLog(config.logTypeServer)
 
 HOST = config.serverListenAddress
 PORT = config.serverPort
@@ -32,9 +34,9 @@ def recvCallback(data):
             pass
     except ConnectionResetError as e:
         exceptionTypeName = example.getObjectTypeName(e)
-        print(f'{exceptionTypeName}: {e}')
+        log.printToLog(f'{exceptionTypeName}: {e}')
 
-    print(f"Disconnected by {addr}")
+    log.printToLog(f"Disconnected by {addr}")
     selector.unregister(conn)
     conn.close()
     connectionCount = connectionCount - 1
@@ -45,13 +47,13 @@ def acceptCallback(serverSocket):
 
     conn, addr = serverSocket.accept()
     conn.setblocking(False)
-    print(f"Connected by {addr}")
+    log.printToLog(f"Connected by {addr}")
 
     connectionCount = connectionCount + 1
     if connectionCount > config.serverMaxConnection:
         conn.close()
         connectionCount = connectionCount - 1
-        print(f"Connection limit {connectionCount} exceeded, connection closed")
+        log.printToLog(f"Connection limit {connectionCount} exceeded, connection closed")
         return
 
     selectorData = ConnectionCallback(recvCallback, (conn, addr))
@@ -73,7 +75,7 @@ selector.register(serverSocket, selectors.EVENT_READ, data=selectorData)
 
 # Server event loop
 while True:
-    print("Ready for connection")
+    log.printToLog("Ready for connection")
     events = selector.select()
     for key, mask in events:
         selectorData = key.data
