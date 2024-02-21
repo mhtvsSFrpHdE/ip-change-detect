@@ -3,6 +3,7 @@ import time    # nopep8
 import os    # nopep8
 import sys    # nopep8
 import keepalive    # nopep8
+import logging    # nopep8
 from json import JSONDecodeError    # nopep8
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
@@ -99,9 +100,9 @@ while True:
                 log.printToLog('Server verified by preshared key')
 
             if sameVersion == False:
-                log.printToLog('Warning: Server version is different than previous connected server')
+                log.printToLog('Server version is different than previous connected server', level=logging.WARNING)
             if sameIdentity == False:
-                log.printToLog('Warning: Server identity is different than previous connected server')
+                log.printToLog('Server identity is different than previous connected server', level=logging.WARNING)
                 verify_server.knownServerIdentity = response.serverIdentity
 
             # Server will not send future response
