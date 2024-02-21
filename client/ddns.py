@@ -1,8 +1,10 @@
 import CloudFlare    # nopep8
+import time    # nopep8
+import subprocess    # nopep8
+
 import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
-import subprocess    # nopep8
 
 def updateDnsRecord(targetAddress):
     try:
@@ -45,3 +47,5 @@ def ddnsMain():
 
     updateDnsRecord(currentExternalIpAddress)
     print(f'DNS record has updated to: {currentExternalIpAddress}')
+
+    time.sleep(config.clientReconnectInterval)
