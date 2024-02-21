@@ -48,4 +48,4 @@ def ddnsMain():
     updateDnsRecord(currentExternalIpAddress)
     print(f'DNS record has updated to: {currentExternalIpAddress}')
 
-    time.sleep(config.clientReconnectInterval)
+    time.sleep(config.cloudflareApiSumbitDelay)
