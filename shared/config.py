@@ -105,7 +105,6 @@ debugClientConnectToListenAddress = False
 
 # string, Where to save logs
 logFolder = "../logs/<type>"
-logFolder = "logs/<type>"
 # string, Server log or client log
 logTypePlaceholder="<type>"
 # string, Timestamp position in log file name
