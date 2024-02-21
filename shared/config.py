@@ -97,7 +97,6 @@ serverIdentityLength = 20
 debugServerFixIdentity = False
 # bool, client connect to serverListenAddress directly instead of get server address from DNS record
 debugClientConnectToListenAddress = False
-debugClientConnectToListenAddress = False
 
 # ===== Debug flag =====
 
