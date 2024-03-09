@@ -38,7 +38,6 @@ clientInternetAliveServer = "1.1.1.1"
 clientInternetAliveQuery = "bing.com"
 # bool, Use cloudflare API to update DNS record and get DDNS
 clientUseCloudflare = False
-clientUseCloudflare = True
 # string, Your cloudflare API token
 clientCloudflareApiToken = None
 # string, Your cloudflare zone name, usually is your domain root name, "bing.com"
