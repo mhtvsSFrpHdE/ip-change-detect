@@ -121,6 +121,14 @@ while True:
             # Block at here, keep long connection
             s.settimeout(None)
             data = s.recv(config.socketBufferLength)
+        except custom_exception.ClientDnsUnavailableException as e:
+            # Can't get server address from DNS record, client dns has not response
+            # This error has no solution to handle it, client dns must be success to continue
+
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e}')
+
+            time.sleep(config.clientReconnectInterval)
         except JSONDecodeError as e:
             # Failed to parse JSON, connected to unknown server, IP address may be changed
 

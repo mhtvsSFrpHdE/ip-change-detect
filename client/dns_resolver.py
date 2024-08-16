@@ -26,6 +26,17 @@ def getCurrentDnsRecord():
     if config.debugClientConnectToListenAddress == True:
         return config.serverListenAddress
 
-    answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype=config.clientDnsRecordType)
+    try:
+        answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype=config.clientDnsRecordType)
+    except dns.resolver.LifetimeTimeout as e:
+        try:
+            internet_alive.testInternet()
+        except custom_exception.InternetOfflineException as internetOfflineException:
+            raise internetOfflineException
+
+        clientDnsUnavailableException = custom_exception.ClientDnsUnavailableException()
+        clientDnsUnavailableException.rawException = e
+        raise clientDnsUnavailableException
+
     currentIpAddress = answer[0].to_text()
     return currentIpAddress

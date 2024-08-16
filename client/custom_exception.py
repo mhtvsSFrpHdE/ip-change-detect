@@ -30,6 +30,9 @@ class CloudFlareException(RawException):
 class OpenDnsUnavailableException(RawException):
     pass
 
+class ClientDnsUnavailableException(RawException):
+    pass
+
 # Stop catch unknown exception, use this one for a while to actually catch nothing
 class ExceptionPlaceholder(Exception):
     pass
