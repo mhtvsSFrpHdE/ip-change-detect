@@ -62,7 +62,11 @@ def acceptCallback(serverSocket):
     if config.debugServerFixIdentity:
         response.serverIdentity = response.presharedKey
     responseAsJsonString = response.toJson()
-    conn.sendall(responseAsJsonString.encode())
+    try:
+        conn.sendall(responseAsJsonString.encode())
+    except ConnectionResetError as e:
+        exceptionTypeName = example.getObjectTypeName(e)
+        log.printToLog(f'{exceptionTypeName}: {e}')
 
 # Create and listen server socket
 serverSocket = socket.socket()
