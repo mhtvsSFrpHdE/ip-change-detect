@@ -131,17 +131,6 @@ while True:
             # Block at here, keep long connection
             s.settimeout(None)
             data = s.recv(config.socketBufferLength)
-        except WindowsError as e:
-            exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
-
-            # Unreachable network, retry until update DDNS
-            if e.winerror == 10051:
-                connect.queueNetworkRetry()
-            else:
-                unknownException = custom_exception.UnknownException()
-                unknownException.rawException = e
-                raise unknownException
         except custom_exception.ClientDnsUnavailableException as e:
             # Can't get server address from DNS record, client dns has not response
             # This error has no solution to handle it, client dns must be success to continue
@@ -209,6 +198,19 @@ while True:
 
             time.sleep(config.clientReconnectInterval)
             internet_alive.internetOnline = False
+        # Make WindowsError have lower priority during exception handling
+        # It will also catch TimeoutError
+        except WindowsError as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e}')
+
+            # Unreachable network, retry until update DDNS
+            if e.winerror == 10051:
+                connect.queueNetworkRetry()
+            else:
+                unknownException = custom_exception.UnknownException()
+                unknownException.rawException = e
+                raise unknownException
         except custom_exception.ExceptionPlaceholder as e:
             # Unknown is bad, stop future action
 
