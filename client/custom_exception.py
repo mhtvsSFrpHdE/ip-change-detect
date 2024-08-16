@@ -36,3 +36,7 @@ class ClientDnsUnavailableException(RawException):
 # Stop catch unknown exception, use this one for a while to actually catch nothing
 class ExceptionPlaceholder(Exception):
     pass
+
+# Must stop code execution on some case, raise this
+class UnknownException(RawException):
+    pass

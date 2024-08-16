@@ -26,20 +26,36 @@ def getExternalIpAddress():
     return externalIpAddress
 
 def getCurrentDnsRecord():
-    if config.debugClientConnectToListenAddress == True:
-        return config.serverListenAddress
+    if config.clientIPv6Mode == False:
+        if config.debugClientConnectToListenAddress == True:
+            return config.serverListenAddress
 
-    try:
-        answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype="A")
-    except dns.resolver.LifetimeTimeout as e:
         try:
-            internet_alive.testInternet()
-        except custom_exception.InternetOfflineException as internetOfflineException:
-            raise internetOfflineException
+            answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype="A")
+        except dns.resolver.LifetimeTimeout as e:
+            try:
+                internet_alive.testInternet()
+            except custom_exception.InternetOfflineException as internetOfflineException:
+                raise internetOfflineException
 
-        clientDnsUnavailableException = custom_exception.ClientDnsUnavailableException()
-        clientDnsUnavailableException.rawException = e
-        raise clientDnsUnavailableException
+            clientDnsUnavailableException = custom_exception.ClientDnsUnavailableException()
+            clientDnsUnavailableException.rawException = e
+            raise clientDnsUnavailableException
 
-    currentIpAddress = answer[0].to_text()
-    return currentIpAddress
+        currentIpAddress = answer[0].to_text()
+        return currentIpAddress
+    if config.clientIPv6Mode == True:
+        try:
+            answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord6, rdtype="AAAA")
+        except dns.resolver.LifetimeTimeout as e:
+            try:
+                internet_alive.testInternet()
+            except custom_exception.InternetOfflineException as internetOfflineException:
+                raise internetOfflineException
+
+            clientDnsUnavailableException = custom_exception.ClientDnsUnavailableException()
+            clientDnsUnavailableException.rawException = e
+            raise clientDnsUnavailableException
+
+        currentIpAddress = answer[0].to_text()
+        return currentIpAddress

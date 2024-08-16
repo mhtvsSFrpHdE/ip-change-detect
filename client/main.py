@@ -5,7 +5,7 @@ import sys    # nopep8
 import keepalive    # nopep8
 import logging    # nopep8
 from json import JSONDecodeError    # nopep8
-from argparse import ArgumentParser
+from argparse import ArgumentParser    # nopep8
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 import config    # nopep8
@@ -41,7 +41,7 @@ while True:
             # or DNS server has no response
 
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
 
             time.sleep(config.clientReconnectInterval)
             continue
@@ -52,13 +52,13 @@ while True:
             connect.ddnsRequest = False
         except custom_exception.OpenDnsUnavailableException as e:
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
             log.printToLog("Open DNS unavailable, retrying")
 
             connect.ddnsRequest = True
         except custom_exception.CloudFlareException as e:
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
             log.printToLog("DDNS request failed, retrying")
 
             connect.ddnsRequest = True
@@ -71,8 +71,11 @@ while True:
             internet_alive.internetOnline = False
         continue
 
+    socketFamily = socket.AF_INET
+    if config.clientIPv6Mode:
+        socketFamily = socket.AF_INET6
     # Connect to server
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    with socket.socket(socketFamily, socket.SOCK_STREAM) as s:
         try:
             serverAddress = dns_resolver.getCurrentDnsRecord()
             serverPort = config.serverPort
@@ -128,12 +131,23 @@ while True:
             # Block at here, keep long connection
             s.settimeout(None)
             data = s.recv(config.socketBufferLength)
+        except WindowsError as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e}')
+
+            # Unreachable network, retry until update DDNS
+            if e.winerror == 10051:
+                connect.queueNetworkRetry()
+            else:
+                unknownException = custom_exception.UnknownException()
+                unknownException.rawException = e
+                raise unknownException
         except custom_exception.ClientDnsUnavailableException as e:
             # Can't get server address from DNS record, client dns has not response
             # This error has no solution to handle it, client dns must be success to continue
 
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
 
             time.sleep(config.clientReconnectInterval)
         except JSONDecodeError as e:

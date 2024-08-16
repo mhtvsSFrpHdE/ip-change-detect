@@ -33,8 +33,10 @@ clientDnsResolver = None
 clientDnsRecord = None
 # Placeholder, use client\main.py -6 or --ipv6 to enable IPv6 mode
 clientIPv6Mode = False
-# Your SLAAC IPv6 address goes here
+# string, Your SLAAC IPv6 address goes here
 clientDnsRecord6 = None
+# string, Your SLAAC interface name shows in ipconfig
+clientInterfaceName6 = "Ethernet"
 # string, specify a DNS server and DNS record here
 # This DNS server will be used for internet online test
 # Specify a different server than dnsResolver can let you to know
@@ -54,6 +56,8 @@ clientCloudflareApiSumbitDelay = 30
 # specify an external command that can update your DDNS
 # or anything else
 clientExternalActionOnIpChange = "ping.exe 1.1.1.1"
+# string, IPv6 external action
+clientExternalActionOnIpChange6 = "ping.exe 2606:4700:4700::1111"
 
 # ===== Client config =====
 
