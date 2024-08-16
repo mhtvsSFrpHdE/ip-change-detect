@@ -43,6 +43,12 @@ while True:
         try:
             ddns.ddnsMain()
             connect.ddnsRequest = False
+        except custom_exception.OpenDnsUnavailableException as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog("Open DNS unavailable, retrying")
+
+            connect.ddnsRequest = True
         except custom_exception.CloudFlareException as e:
             exceptionTypeName = example.getObjectTypeName(e)
             log.printToLog(f'{exceptionTypeName}: {e}')
