@@ -7,8 +7,12 @@ presharedKey = "9IGFWa9hcKmtbh0CNsdj"
 
 # ===== Server config =====
 
-# string, IP address like "192.168.1.100"
-serverListenAddress = "127.0.0.1"
+# string, IP address like "192.168.1.100", or "0.0.0.0" to all IP addresses
+serverListenAddress = "0.0.0.0"
+# Placeholder, use server\main.py -6 or --ipv6 to enable IPv6 mode
+serverIPv6Mode = False
+# string, IPv6 address if not none, "::" to all IPv6 addresses
+serverListenAddress6 = "::"
 # int, port number
 serverPort = 65432
 

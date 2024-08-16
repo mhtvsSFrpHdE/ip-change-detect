@@ -6,14 +6,22 @@ import keepalive    # nopep8
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 from response import Response    # nopep8
+from argparse import ArgumentParser    # nopep8
 import config    # nopep8
 import example    # nopep8
 import log    # nopep8
 
+parser = ArgumentParser()
+parser.add_argument("-6", "--ipv6", action="store_true", help="Run in IPv6 mode")
+args = parser.parse_args()
+if (args.ipv6):
+    config.serverIPv6Mode = True
+
 log.initLog(config.logTypeServer)
 
 HOST = config.serverListenAddress
-PORT = config.serverPort
+if config.serverIPv6Mode:
+    HOST = config.serverListenAddress6
 response = Response()
 selector = selectors.DefaultSelector()
 connectionCount = 0
@@ -69,9 +77,13 @@ def acceptCallback(serverSocket):
         log.printToLog(f'{exceptionTypeName}: {e}')
 
 # Create and listen server socket
-serverSocket = socket.socket()
+serverSocket = None
+if (config.serverIPv6Mode == False):
+    serverSocket = socket.socket()
+if (config.serverIPv6Mode == True):
+    serverSocket = socket.socket(family=socket.AF_INET6)
 keepalive.set(serverSocket, after_idle_sec=config.keepaliveAfterIdleSec, interval_sec=config.keepaliveIntervalSec, max_fails=config.keepaliveMaxFails)
-serverSocket.bind((HOST, PORT))
+serverSocket.bind((HOST, config.serverPort))
 serverSocket.listen()
 serverSocket.setblocking(False)
 selectorData = ConnectionCallback(acceptCallback, serverSocket)
