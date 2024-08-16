@@ -44,7 +44,7 @@ clientCloudflareApiToken = None
 clientCloudflareZoneName = None
 # int, After call cloudflare API, wait second before try to continue connect
 # DNS record takes few time to be updated
-clientCloudflareApiSumbitDelay = 5
+clientCloudflareApiSumbitDelay = 30
 # string, If your domain is not use cloudflare DNS
 # specify an external command that can update your DDNS
 # or anything else
