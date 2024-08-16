@@ -43,10 +43,16 @@ while True:
         try:
             ddns.ddnsMain()
             connect.ddnsRequest = False
-        except custom_exception.InternetOfflineException as e:
+        except custom_exception.CloudFlareException as e:
             exceptionTypeName = example.getObjectTypeName(e)
             log.printToLog(f'{exceptionTypeName}: {e}')
             log.printToLog("DDNS request failed, retrying")
+
+            connect.ddnsRequest = True
+        except custom_exception.InternetOfflineException as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e}')
+            log.printToLog("DDNS request failed, internet offline, retrying")
 
             connect.ddnsRequest = True
             internet_alive.internetOnline = False

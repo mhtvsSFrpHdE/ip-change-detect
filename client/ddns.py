@@ -6,6 +6,7 @@ import config    # nopep8
 import custom_exception    # nopep8
 import dns_resolver    # nopep8
 import log    # nopep8
+import internet_alive    # nopep8
 
 def updateDnsRecord(targetAddress):
     try:
@@ -25,7 +26,12 @@ def updateDnsRecord(targetAddress):
             'content':targetAddress
         }
         cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
-    except custom_exception.ExceptionPlaceholder as e:
+    except CloudFlare.exceptions.CloudFlareAPIError as e:
+        try:
+            internet_alive.testInternet()
+        except custom_exception.InternetOfflineException as internetOfflineException:
+            raise internetOfflineException
+
         cloudFlareException = custom_exception.CloudFlareException()
         cloudFlareException.rawException = e
         raise cloudFlareException
