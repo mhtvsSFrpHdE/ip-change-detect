@@ -98,7 +98,7 @@ def ddnsMain():
 
         # Get IPv6 address
         currentExternalIpAddress = None
-        rawIpconfigOutput = check_output(["cmd", "/c", "ipconfig_437.bat"], universal_newlines=True)
+        rawIpconfigOutput = check_output(["cmd", "/c", "chcp 437 > nul && ipconfig"], universal_newlines=True)
         rawTargetInterface = []
         targetInterfaceDiscovered = False
         for line in rawIpconfigOutput.splitlines():
