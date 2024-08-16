@@ -103,9 +103,14 @@ def ddnsMain():
         targetInterfaceDiscovered = False
         for line in rawIpconfigOutput.splitlines():
             if targetInterfaceDiscovered == False:
-                if line.endswith(config.clientInterfaceName6 + ":"):
+                isTargetInterface = line.endswith(config.clientInterfaceName6 + ":")
+                if isTargetInterface:
                     targetInterfaceDiscovered = True
+                    continue
             if targetInterfaceDiscovered == True:
+                isAnotherInterface = ("adapter" in line) and line.endswith(":")
+                if (isAnotherInterface):
+                    break
                 rawTargetInterface.append(line)
         for line in rawTargetInterface:
             if line.startswith("   IPv6 Address"):
@@ -115,6 +120,9 @@ def ddnsMain():
                 if isPrivateAddress == False:
                     currentExternalIpAddress = addressSection
                     break
+        if currentExternalIpAddress is None:
+            log.printToLog(f"Can't get current external IP address from interface: {config.clientInterfaceName6}")
+            raise custom_exception.UnknownException()
 
         currentDnsRecord = dns_resolver.getCurrentDnsRecord()
         log.printToLog(f'Current external IP address: {currentExternalIpAddress}')
