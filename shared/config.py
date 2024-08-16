@@ -27,6 +27,10 @@ clientDnsResolver = None
 # string, Your domain A record address like "a.bing.com", client will connect to this address
 # if use cloudflare, DNS record will also submit to this address
 clientDnsRecord = None
+# Placeholder, use client\main.py -6 or --ipv6 to enable IPv6 mode
+clientIPv6Mode = False
+# Your SLAAC IPv6 address goes here
+clientDnsRecord6 = None
 # string, specify a DNS server and DNS record here
 # This DNS server will be used for internet online test
 # Specify a different server than dnsResolver can let you to know

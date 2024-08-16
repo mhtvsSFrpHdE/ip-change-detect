@@ -5,6 +5,7 @@ import sys    # nopep8
 import keepalive    # nopep8
 import logging    # nopep8
 from json import JSONDecodeError    # nopep8
+from argparse import ArgumentParser
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))    # nopep8
 import config    # nopep8
@@ -17,6 +18,12 @@ import internet_alive    # nopep8
 import ddns    # nopep8
 import connect    # nopep8
 import verify_server    # nopep8
+
+parser = ArgumentParser()
+parser.add_argument("-6", "--ipv6", action="store_true", help="Run in IPv6 mode")
+args = parser.parse_args()
+if (args.ipv6):
+    config.clientIPv6Mode = True
 
 log.initLog(config.logTypeClient)
 
