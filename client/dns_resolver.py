@@ -8,7 +8,10 @@ import custom_exception    # nopep8
 
 def getExternalIpAddress():
     try:
-        answer = dns.resolver.resolve_at(where="resolver1.opendns.com", qname="myip.opendns.com", rdtype=config.clientDnsRecordType)
+        # Specify IPv4 dns server address here, by default resolver1.opendns.com resolve to IPv6 OpenDNS server
+        # And will return only IPv6 record, IPv4 record is dns.resolver.NoAnswer
+        # where="resolver1.opendns.com" IPv4 record
+        answer = dns.resolver.resolve_at(where="208.67.222.222", qname="myip.opendns.com", rdtype="A")
     except dns.resolver.LifetimeTimeout as e:
         try:
             internet_alive.testInternet()
@@ -27,7 +30,7 @@ def getCurrentDnsRecord():
         return config.serverListenAddress
 
     try:
-        answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype=config.clientDnsRecordType)
+        answer = dns.resolver.resolve_at(where=config.clientDnsResolver, qname=config.clientDnsRecord, rdtype="A")
     except dns.resolver.LifetimeTimeout as e:
         try:
             internet_alive.testInternet()

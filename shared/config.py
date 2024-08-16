@@ -27,9 +27,6 @@ clientDnsResolver = None
 # string, Your domain A record address like "a.bing.com", client will connect to this address
 # if use cloudflare, DNS record will also submit to this address
 clientDnsRecord = None
-# string, Your domain record type, for IPv4, is "A" record, IPv6 is "AAAA"
-# but currently there is no IPv6 support
-clientDnsRecordType = "A"
 # string, specify a DNS server and DNS record here
 # This DNS server will be used for internet online test
 # Specify a different server than dnsResolver can let you to know
