@@ -19,16 +19,20 @@ def updateDnsRecord(targetAddress):
             zone = zones[0]
             zoneId = zone['id']
 
-            dnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.clientDnsRecord})
-            dnsRecord = dnsRecords[0]
-            dnsRecordId = dnsRecord['id']
+            allDnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.clientDnsRecord})
+            targetDnsRecord = None
+            for dnsRecord in allDnsRecords:
+                if dnsRecord['type'] == 'A':
+                    targetDnsRecord = dnsRecord
+                    break
 
             newDnsRecord = {
-                'name':dnsRecord['name'],
-                'type':dnsRecord['type'],
+                'name':targetDnsRecord['name'],
+                'type':targetDnsRecord['type'],
+                'ttl':targetDnsRecord['ttl'],
                 'content':targetAddress
             }
-            cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
+            cf.zones.dns_records.put(zoneId, targetDnsRecord['id'], data=newDnsRecord)
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             try:
                 internet_alive.testInternet()
@@ -46,16 +50,20 @@ def updateDnsRecord(targetAddress):
             zone = zones[0]
             zoneId = zone['id']
 
-            dnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.clientDnsRecord6})
-            dnsRecord = dnsRecords[0]
-            dnsRecordId = dnsRecord['id']
+            allDnsRecords = cf.zones.dns_records.get(zoneId, params={'name':config.clientDnsRecord6})
+            targetDnsRecord = None
+            for dnsRecord in allDnsRecords:
+                if dnsRecord['type'] == 'AAAA':
+                    targetDnsRecord = dnsRecord
+                    break
 
             newDnsRecord = {
-                'name':dnsRecord['name'],
-                'type':dnsRecord['type'],
+                'name':targetDnsRecord['name'],
+                'type':targetDnsRecord['type'],
+                'ttl':targetDnsRecord['ttl'],
                 'content':targetAddress
             }
-            cf.zones.dns_records.put(zoneId, dnsRecordId, data=newDnsRecord)
+            cf.zones.dns_records.put(zoneId, targetDnsRecord['id'], data=newDnsRecord)
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             try:
                 internet_alive.testInternet()
