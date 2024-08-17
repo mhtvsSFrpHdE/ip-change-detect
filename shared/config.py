@@ -68,11 +68,11 @@ clientSocketTimeout = 3
 # int, second, retry interval when client connection failed
 clientReconnectInterval = 1
 # int, second, max retry count when client connection failed before request DDNS update
-clientRetryMaxCountOnDisconnect = 5
+clientRetryMaxCountOnDisconnect = 1
 # int, second, max retry count when client connect to unknown server (no response)
-clientTimeoutMaxCountOnDisconnect = 5
+clientTimeoutMaxCountOnDisconnect = 1
 # int, second, max retry count when client connect to unknown server (wrong response)
-clientJsonDecodeErrorMaxCountOnDisconnect = 5
+clientJsonDecodeErrorMaxCountOnDisconnect = 1
 
 # ===== Client default value =====
 
