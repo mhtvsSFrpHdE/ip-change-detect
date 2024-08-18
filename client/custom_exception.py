@@ -33,6 +33,11 @@ class OpenDnsUnavailableException(RawException):
 class ClientDnsUnavailableException(RawException):
     pass
 
+# If client keeps sending ddns request but the value is already online
+# External address detection method may not reliable
+class RedundantDdnsAttemptsException(RawException):
+    pass
+
 # Stop catch unknown exception, use this one for a while to actually catch nothing
 class ExceptionPlaceholder(Exception):
     pass

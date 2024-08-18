@@ -74,6 +74,8 @@ def updateDnsRecord(targetAddress):
             cloudFlareException.rawException = e
             raise cloudFlareException
 
+_redundantDdnsAttempts = 0
+
 def ddnsMain():
     if config.clientIPv6Mode == False:
         if (config.clientUseCloudflare == False):
@@ -88,9 +90,14 @@ def ddnsMain():
         log.printToLog(f'Current external IP address: {currentExternalIpAddress}')
         log.printToLog(f'Current DNS record: {currentDnsRecord}')
         if currentDnsRecord == currentExternalIpAddress:
+            _redundantDdnsAttempts = _redundantDdnsAttempts + 1
             log.printToLog(f'DNS record does not need to be updated')
+
+            if (_redundantDdnsAttempts > config.clientMaxRedundantDdnsAttempt):
+                raise custom_exception.RedundantDdnsAttemptsException()
             return
 
+        _redundantDdnsAttempts = 0
         updateDnsRecord(currentExternalIpAddress)
         log.printToLog(f'DNS record has updated to: {currentExternalIpAddress}')
 
