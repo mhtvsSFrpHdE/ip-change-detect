@@ -117,7 +117,7 @@ logTypePlaceholder="<type>"
 # string, Timestamp position in log file name
 logTimestampPlaceholder = "<timestamp>"
 # string Timestamp format, goes to datetime.now().strftime
-logTimestampFormat = "%Y-%m-%d-%H-%M-%S"
+logTimestampFormat = "%Y-%m-%d-%H-%M-%S-%f"
 # string, Log file name with placeholder
 logFileName = "ip-change-detect-<type>-<timestamp>.log"
 # string, Server log folder name
