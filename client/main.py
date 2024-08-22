@@ -33,48 +33,36 @@ while True:
         try:
             internet_alive.testInternet()
             internet_alive.internetOnline = True
+            internet_alive.internetOfflineMessagePrinted = False
             continue
         except custom_exception.InternetOfflineException as e:
-            # Failed to test internet, internet may be offline
-            # The reason to use different exception from NoNameservers
-            # You can know is internet alive server has no response
-            # or DNS server has no response
-
-            exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
-
+            if (internet_alive.internetOfflineMessagePrinted == False):
+                exceptionTypeName = example.getObjectTypeName(e)
+                log.printToLog(f'{exceptionTypeName}: {e.rawException}')
+                internet_alive.internetOfflineMessagePrinted = True
             time.sleep(config.clientReconnectInterval)
             continue
+
     # Update DDNS if needed
     if connect.ddnsRequest == True:
         try:
             ddns.ddnsMain()
             connect.ddnsRequest = False
-        except custom_exception.OpenDnsUnavailableException as e:
-            exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
-            log.printToLog("Open DNS unavailable, retrying")
-
-            connect.ddnsRequest = True
-        except custom_exception.CloudFlareException as e:
-            exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
-            log.printToLog("DDNS request failed, retrying")
-
-            connect.ddnsRequest = True
         except custom_exception.InternetOfflineException as e:
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e}')
-            log.printToLog("DDNS request failed, internet offline, retrying")
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
 
-            connect.ddnsRequest = True
             internet_alive.internetOnline = False
+            internet_alive.internetOfflineMessagePrinted = True
+        except (custom_exception.RawException) as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
         continue
 
+    # Connect to server
     socketFamily = socket.AF_INET
     if config.clientIPv6Mode:
         socketFamily = socket.AF_INET6
-    # Connect to server
     with socket.socket(socketFamily, socket.SOCK_STREAM) as s:
         try:
             serverAddress = dns_resolver.getCurrentDnsRecord()
@@ -131,14 +119,11 @@ while True:
             # Block at here, keep long connection
             s.settimeout(None)
             data = s.recv(config.socketBufferLength)
-        except custom_exception.ClientDnsUnavailableException as e:
-            # Can't get server address from DNS record, client dns has not response
-            # This error has no solution to handle it, client dns must be success to continue
-
+        except custom_exception.InternetOfflineException as e:
             exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
+            log.printToLog(f'{exceptionTypeName}: {e}')
 
-            time.sleep(config.clientReconnectInterval)
+            internet_alive.internetOnline = False
         except JSONDecodeError as e:
             # Failed to parse JSON, connected to unknown server, IP address may be changed
 
@@ -182,7 +167,7 @@ while True:
             log.printToLog(f'{exceptionTypeName}: {e}')
 
             connect.queueNetworkRetry()
-        except dns_resolver.NoNameservers as e:
+        except dns_resolver.dns.resolver.NoNameservers as e:
             # Failed to query ip address, DNS server or internet may be offline
 
             exceptionTypeName = example.getObjectTypeName(e)
@@ -190,7 +175,7 @@ while True:
 
             time.sleep(config.clientReconnectInterval)
             internet_alive.internetOnline = False
-        except dns_resolver.LifetimeTimeout as e:
+        except dns_resolver.dns.resolver.LifetimeTimeout as e:
             # Failed to query ip address, DNS server or internet may be offline
 
             exceptionTypeName = example.getObjectTypeName(e)

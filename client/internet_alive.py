@@ -3,6 +3,8 @@ import dns.resolver    # nopep8
 import custom_exception    # nopep8
 
 internetOnline = False
+# Print internet offline message only once
+internetOfflineMessagePrinted = False
 
 def testInternet():
     try:
@@ -16,10 +18,10 @@ def testInternet():
         # From offline to online
         dns.resolver.reset_default_resolver()
     except dns.resolver.NoNameservers as e:
-        internetOfflineException = custom_exception.InternetOfflineException("Internet offline")
+        internetOfflineException = custom_exception.InternetOfflineException()
         internetOfflineException.rawException = e
         raise internetOfflineException
     except dns.resolver.LifetimeTimeout as e:
-        internetOfflineException = custom_exception.InternetOfflineException("Internet offline")
+        internetOfflineException = custom_exception.InternetOfflineException()
         internetOfflineException.rawException = e
         raise internetOfflineException

@@ -1,12 +1,8 @@
 class MaximumRetryCountException(Exception):
     pass
 
-# In case of connected to wrong server, it may not response in certain time
-
 class MaximumTimeoutCountException(Exception):
     pass
-
-# In case of connected to wrong server, response may wrong
 
 class MaximumJsonDecodeErrorCountException(Exception):
     pass
@@ -24,13 +20,12 @@ class RawException(Exception):
 class InternetOfflineException(RawException):
     pass
 
-class CloudFlareException(RawException):
+# Cloudflare API error
+class DdnsProviderException(RawException):
     pass
 
-class OpenDnsUnavailableException(RawException):
-    pass
-
-class ClientDnsUnavailableException(RawException):
+# DNS resolver error
+class DnsResolverException(RawException):
     pass
 
 # If client keeps sending ddns request but the value is already online

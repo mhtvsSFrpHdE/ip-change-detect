@@ -73,6 +73,8 @@ clientRetryMaxCountOnDisconnect = 1
 clientTimeoutMaxCountOnDisconnect = 1
 # int, second, max retry count when client connect to unknown server (wrong response)
 clientJsonDecodeErrorMaxCountOnDisconnect = 1
+# int, second, max ddns attempts when requested change is not required
+clientMaxRedundantDdnsAttempt = 1
 
 # ===== Client default value =====
 
