@@ -13,7 +13,7 @@ def updateDnsRecord(targetAddress):
     if config.clientIPv6Mode == False:
         cf = cloudflare.Cloudflare(api_token=config.clientCloudflareApiToken)
 
-        allDnsRecords = cf.dns.records.list(zone_id=config.clientCloudflareZoneId, name=config.clientDnsRecord6)
+        allDnsRecords = cf.dns.records.list(zone_id=config.clientCloudflareZoneId, name=config.clientDnsRecord)
         targetDnsRecord = None
         for dnsRecord in allDnsRecords:
             if dnsRecord.type == 'A':
