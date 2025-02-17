@@ -82,10 +82,10 @@ clientMaxRedundantDdnsAttempt = 1
 
 # int, Socket keepalive settings, if server or client suddenly done
 # socket will not shutdown automatically and on both side don't know another side is off
-# keepalive packet 60, 0, 0 may test connection is alive each minute
+# keepalive packet 60, 60, 1 may test connection is alive each minute
 keepaliveAfterIdleSec = 60
-keepaliveIntervalSec = 0
-keepaliveMaxFails = 0
+keepaliveIntervalSec = 60
+keepaliveMaxFails = 1
 # int, socket recv argument
 socketBufferLength = 1024
 
