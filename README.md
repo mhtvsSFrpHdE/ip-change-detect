@@ -21,10 +21,6 @@ Also they bound to certain provider make them not portable.
 After client is connected, your DDNS is set, otherwise you can get notified with  
 `IPv6 external action` on external IP changed.
 
-## Expermental IPv6 support
-Currently external address detect of built-in DDNS support only Windows.  
-Use third party tools for IPv6 DDNS.
-
 ## Behind
 This program use server listen on port and connect to the port to go through IPv4 NAT.  
 If connection dead, consider external IPv4 address is changed,  
