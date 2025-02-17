@@ -54,9 +54,6 @@ while True:
 
             internet_alive.internetOnline = False
             internet_alive.internetOfflineMessagePrinted = True
-        except (custom_exception.RawException) as e:
-            exceptionTypeName = example.getObjectTypeName(e)
-            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
         continue
 
     # Connect to server

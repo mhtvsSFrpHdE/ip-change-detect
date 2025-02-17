@@ -47,8 +47,8 @@ clientInternetAliveQuery = "bing.com"
 clientUseCloudflare = False
 # string, Your cloudflare API token
 clientCloudflareApiToken = None
-# string, Your cloudflare zone name, usually is your domain root name, "bing.com"
-clientCloudflareZoneName = None
+# string, Your cloudflare zone id
+clientCloudflareZoneId = None
 # int, After call cloudflare API, wait second before try to continue connect
 # DNS record takes few time to be updated
 clientCloudflareApiSumbitDelay = 30
