@@ -54,6 +54,11 @@ while True:
 
             internet_alive.internetOnline = False
             internet_alive.internetOfflineMessagePrinted = True
+        except custom_exception.DdnsProviderException as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
+
+            connect.ddnsRequest = True
         continue
 
     # Connect to server

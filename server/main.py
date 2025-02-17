@@ -46,6 +46,9 @@ def recvCallback(data):
     except ConnectionAbortedError as e:
         exceptionTypeName = example.getObjectTypeName(e)
         log.printToLog(f'{exceptionTypeName}: {e}')
+    except TimeoutError as e:
+        exceptionTypeName = example.getObjectTypeName(e)
+        log.printToLog(f'{exceptionTypeName}: {e}')
     log.printToLog(f"Disconnected by {addr}")
     selector.unregister(conn)
     conn.close()
