@@ -29,7 +29,6 @@ def updateDnsRecord(targetAddress):
         for dnsRecord in allDnsRecords:
             if dnsRecord.type == 'AAAA':
                 targetDnsRecord = dnsRecord
-                print(dnsRecord)
                 break
 
         cf.dns.records.edit(zone_id=config.clientCloudflareZoneId, dns_record_id=targetDnsRecord.id, content=targetAddress)
