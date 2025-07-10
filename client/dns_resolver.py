@@ -6,7 +6,17 @@ def getExternalIpAddress():
     # Specify IPv4 dns server address here, by default resolver1.opendns.com resolve to IPv6 OpenDNS server
     # And will return only IPv6 record, IPv4 record is dns.resolver.NoAnswer
     # where="resolver1.opendns.com" IPv4 record
-    answer = dns.resolver.resolve_at(where="208.67.222.222", qname="myip.opendns.com", rdtype="A")
+    ns1 = "208.67.222.222"
+    ns2 = "208.67.220.220"
+    try:
+        answer = dns.resolver.resolve_at(where=ns1, qname="myip.opendns.com", rdtype="A")
+        externalIpAddress = answer[0].to_text()
+        return externalIpAddress
+    # Ignore first fail
+    except dns.exception.DNSException:
+        pass
+
+    answer = dns.resolver.resolve_at(where=ns2, qname="myip.opendns.com", rdtype="A")
     externalIpAddress = answer[0].to_text()
     return externalIpAddress
 

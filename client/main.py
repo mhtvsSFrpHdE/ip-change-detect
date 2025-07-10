@@ -59,6 +59,12 @@ while True:
             log.printToLog(f'{exceptionTypeName}: {e.rawException}')
 
             connect.ddnsRequest = True
+        except custom_exception.DnsResolverException as e:
+            exceptionTypeName = example.getObjectTypeName(e)
+            log.printToLog(f'{exceptionTypeName}: {e.rawException}')
+
+            internet_alive.internetOnline = False
+            internet_alive.internetOfflineMessagePrinted = True
         continue
 
     # Connect to server

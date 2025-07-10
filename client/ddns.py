@@ -96,7 +96,7 @@ def ddnsMain():
         cloudFlareException = custom_exception.DdnsProviderException()
         cloudFlareException.rawException = e
         raise cloudFlareException
-    except (dns_resolver.dns.resolver.LifetimeTimeout, dns_resolver.dns.resolver.NoNameservers) as e:
+    except (dns_resolver.dns.exception.DNSException) as e:
         try:
             internet_alive.testInternet()
         except custom_exception.InternetOfflineException as internetOfflineException:
